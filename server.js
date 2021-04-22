@@ -1,5 +1,13 @@
+const dotenv = require('dotenv').config()
 const express = require('express')
 const app = express()
+const mongoose = require('mongoose');
+const password = process.env.PASSWORD
+const username = process.env.USERNAME
+/*mongoose.connect('mongodb://localhost:27017/whiteboard',
+    {useNewUrlParser: true, useUnifiedTopology: true});*/
+mongoose.connect(`mongodb+srv://${username}:${password}@cluster1.rsftk.mongodb.net/whiteboard?retryWrites=true&w=majority`,
+    {useNewUrlParser: true, useUnifiedTopology: true});
 
 // configure CORS
 app.use(function (req, res, next) {
@@ -16,8 +24,16 @@ const quizzesController = require("./controllers/quizzes-controller")
 quizzesController(app)
 */
 
+var bodyParser = require('body-parser')
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
+
 require("./controllers/quizzes-controller")(app)
 require("./controllers/questions-controller")(app)
+require('./controllers/quiz-attempts-controller')(app)
 
 
-app.listen(3001)
+const port = process.env.PORT || 3001
+app.listen(port, function(){
+    console.log("App is running on port: " + port);
+});
